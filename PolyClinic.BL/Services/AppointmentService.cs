@@ -1,7 +1,7 @@
 ﻿using PolyClinic.Common.Models;
 using PolyClinic.BL.Interface;
-using PolyClinic.DAL;
-
+using Microsoft.Extensions.Logging;
+using PolyClinic.DAL.Interface;
 
 namespace PolyClinic.BL.Services
 {
@@ -10,61 +10,93 @@ namespace PolyClinic.BL.Services
     /// </summary>
     public class AppointmentService : IAppointmentService
     {
-        private readonly IPolyClinicRepository _repository;
-
+        private readonly IAppointmentRepository _repository;
         private readonly IMapper<Common.Models.Appointment, DAL.Models.Appointment> _mapper;
-        public AppointmentService(IPolyClinicRepository repository)
+        private readonly ILogger<AppointmentService> _logger;
+
+        /// <summary>
+        /// Creates Appointment service instance with specified repository and logger instances
+        /// </summary>
+        /// <param name="repository">Repository instance</param>
+        /// <param name="logger">ILogger instance</param>
+        public AppointmentService(IAppointmentRepository repository, ILogger<AppointmentService> logger)
         {
             _repository = repository;
             _mapper = new Mapper.AppointmentMapper();
+            _logger = logger;
         }
 
         /// <summary>
-        /// Method to fetch all the appointments
+        /// Fetches all the appointments
         /// </summary>
-        /// <returns>Returns list of appointments</returns>
+        /// <returns>List of Appointment instances if found. Otherwise, null</returns>
         public List<Appointment> GetAllAppointments()
         {
-            List<Appointment> appointments;
+            _logger.LogTrace(message: "[OnMethodExecuting] \tMethod: \t{name}", this.GetType());
+
+            List<Appointment> appointments = null;
             try
             {
-                appointments = _repository.GetAllAppointments().ToList().ConvertAll(_mapper.Map);
+                // Fetches all instance(s) of DAL Appointment model
+                var appointmentsDAO = _repository.GetAllAppointments();
+                // Converts into Common Appointment model
+                if (appointmentsDAO != null)
+                {
+                    appointments = appointmentsDAO.ConvertAll(_mapper.Map);
+                }
             }
             catch (Exception ex)
             {
-                appointments = null;
-                Console.WriteLine(ex.Message);
+                _logger.LogError(ex, message: "Exception Message: {msg}.\n Occurred on Method: {name}", ex.Message, this.GetType());
+            }
+            finally
+            {
+                _logger.LogTrace(message: "[OnMethodExecuted] \t\tMethod: \t{name}", this.GetType());
             }
             return appointments;
         }
 
         /// <summary>
-        /// Method to fetch details of a particular appointment
+        /// Fetches details of a particular appointment
         /// </summary>
-        /// <param name="patientId">Patient Id</param>
-        /// <returns>Return details of a patient</returns>
+        /// <param name="appointmentNo">Appointment number</param>
+        /// <returns>Specified Appointment instance if found. Otherwise, null</returns>
         public Appointment GetAppointmentByNo(int appointmentNo)
         {
-            Appointment appointment;
+            _logger.LogTrace(message: "[OnMethodExecuting] \tMethod: \t{name}", this.GetType());
+
+            Appointment appointment = null;
             try
             {
-                appointment = _mapper.Map(_repository.GetAppointment(appointmentNo));
+                // Fetches specific instance of DAL Appointment model
+                var appointmentDAO = _repository.GetAppointment(appointmentNo);
+                // Converts into Common Appointment model using custom mapper
+                if (appointmentDAO != null)
+                {
+                    appointment = _mapper.Map(appointmentDAO);
+                }
             }
             catch (Exception ex)
             {
-                appointment = null;
-                Console.WriteLine(ex.Message);
+                _logger.LogError(ex, message: "Exception Message: {msg}.\n Occurred on Method: {name}", ex.Message, this.GetType());
+
+            }
+            finally
+            {
+                _logger.LogTrace(message: "[OnMethodExecuted] \t\tMethod: \t{name}", this.GetType());
             }
             return appointment;
         }
 
         /// <summary>
-        /// Method to cancel an appointment
+        /// Removes an appointment instance
         /// </summary>
         /// <param name="appointmentNo">Appointment Number</param>
-        /// <returns>Returns true on successful action. Otherwise, returns false</returns>
+        /// <returns>true if specified Appointment instance removed successfully. Otherwise, false</returns>
         public bool CancelAppointment(int appointmentNo)
         {
+            _logger.LogTrace(message: "[OnMethodExecuting] \tMethod: \t{name}", this.GetType());
+
             bool status;
             try
             {
@@ -73,9 +105,15 @@ namespace PolyClinic.BL.Services
             catch (Exception ex)
             {
                 status = false;
-                Console.WriteLine(ex.Message);
+                _logger.LogError(ex, message: "Exception Message: {msg}.\n Occurred on Method: {name}", ex.Message, this.GetType());
             }
+            finally
+            {
+                _logger.LogTrace(message: "[OnMethodExecuted] \t\tMethod: \t{name}", this.GetType());
+            }
+
             return status;
         }
+
     }
 }

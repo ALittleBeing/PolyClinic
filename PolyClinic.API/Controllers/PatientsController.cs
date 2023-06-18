@@ -1,5 +1,4 @@
-﻿using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Http.HttpResults;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using PolyClinic.Common.Models;
 
@@ -8,15 +7,16 @@ namespace PolyClinic.API.Controllers
     /// <summary>
     /// Patient Controller class
     /// </summary>
+    [Authorize]
     [Route("api/[controller]/[action]")]
     [ApiController]
-    public class PatientsController : Controller
+    public class PatientsController : ControllerBase
     {
         private readonly BL.Interface.IPatientService _patientService;
         /// <summary>
         /// Constructor of Patient controller
         /// </summary>
-        /// <param name="service">Businessness logic service injected through Dependency Injection</param>
+        /// <param name="service">BL service injected through Dependency Injection</param>
         public PatientsController(BL.Interface.IPatientService service)
         {
             _patientService = service;
@@ -33,10 +33,10 @@ namespace PolyClinic.API.Controllers
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public ActionResult<IEnumerable<Patient>> GetAllPatientDetails()
+        public ActionResult<IEnumerable<Patient>> GetAllPatients()
         {
             List<Patient> patients;
-            patients = _patientService.GetAllPatientDetails();
+            patients = _patientService.GetAllPatients();
 
             if (patients != null)
             {
@@ -60,13 +60,13 @@ namespace PolyClinic.API.Controllers
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public ActionResult<Patient> GetPatientDetails(string patientId)
+        public ActionResult<Patient> GetPatientById(string patientId)
         {
             if (string.IsNullOrEmpty(patientId))
             {
                 return BadRequest("Please provide valid Patient Id");
             }
-            var patient = _patientService.GetPatientDetails(patientId);
+            var patient = _patientService.GetPatientById(patientId);
             if (patient != null)
             {
                 return Ok(patient);
@@ -87,15 +87,15 @@ namespace PolyClinic.API.Controllers
         [HttpPost]
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public IActionResult AddNewPatientDetails(Patient patient)
+        public IActionResult AddNewPatient([FromBody] Patient patient)
         {
 
             string patientId;
-            patientId = _patientService.AddNewPatientDetails(patient);
+            patientId = _patientService.AddNewPatient(patient);
 
             if (!string.IsNullOrEmpty(patientId))
             {
-                return CreatedAtAction(nameof(AddNewPatientDetails), new { PatientId = patientId });
+                return CreatedAtAction(nameof(GetPatientById), new { patientId }, patientId);
             }
             else
             {
@@ -148,7 +148,7 @@ namespace PolyClinic.API.Controllers
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public IActionResult RemovePatient(string patientId) 
+        public IActionResult RemovePatient(string patientId)
         {
             if (string.IsNullOrEmpty(patientId))
             {

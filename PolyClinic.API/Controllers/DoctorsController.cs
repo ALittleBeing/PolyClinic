@@ -1,11 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using PolyClinic.BL.Interface;
-using PolyClinic.BL.Services;
 using PolyClinic.Common.Models;
 
 namespace PolyClinic.API.Controllers
@@ -13,13 +7,14 @@ namespace PolyClinic.API.Controllers
     /// <summary>
     /// Doctors Controller class
     /// </summary>
+    [Authorize]
     [Route("api/[controller]/[action]")]
     [ApiController]
     public class DoctorsController : ControllerBase
     {
         private readonly BL.Interface.IDoctorService _doctorService;
         /// <summary>
-        /// Constructor of Doctors controller
+        /// Creates Doctors controller instance with injected doctor service instance
         /// </summary>
         /// <param name="doctorService"></param>
         public DoctorsController(BL.Interface.IDoctorService doctorService)
@@ -65,13 +60,13 @@ namespace PolyClinic.API.Controllers
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public ActionResult<Doctor> GetDoctorDetails(string doctorId)
+        public ActionResult<Doctor> GetDoctorById(string doctorId)
         {
             if (string.IsNullOrEmpty(doctorId))
             {
                 return BadRequest("Please provide valid Doctor Id");
             }
-            var doctor = _doctorService.GetDoctorDetails(doctorId);
+            var doctor = _doctorService.GetDoctorById(doctorId);
             if (doctor != null)
             {
                 return Ok(doctor);
@@ -100,7 +95,7 @@ namespace PolyClinic.API.Controllers
 
             if (!string.IsNullOrEmpty(doctorId))
             {
-                return CreatedAtAction(nameof(AddNewDoctor), new { DoctorId = doctorId });
+                return CreatedAtAction(nameof(GetDoctorById), new { doctorId }, doctorId);
             }
             else
             {
@@ -129,7 +124,7 @@ namespace PolyClinic.API.Controllers
             }
 
             bool status;
-            status = _doctorService.UpdateDoctorFess(doctorId, fees);
+            status = _doctorService.UpdateDoctorFees(doctorId, fees);
 
             if (status)
             {
@@ -172,5 +167,6 @@ namespace PolyClinic.API.Controllers
                 return NotFound("Doctor details not found. Make sure Doctor Id is correct");
             }
         }
+
     }
 }

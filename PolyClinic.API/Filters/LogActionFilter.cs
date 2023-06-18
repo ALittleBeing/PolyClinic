@@ -5,7 +5,7 @@ namespace PolyClinic.API.Filters
     /// <summary>
     /// Custom Action Filter for Logs on Action excecution
     /// </summary>
-    public class LogActionFilter:IActionFilter
+    public class LogActionFilter : IActionFilter
     {
         private readonly ILogger<LogActionFilter> _logger;
 
@@ -25,7 +25,7 @@ namespace PolyClinic.API.Filters
         public void OnActionExecuting(ActionExecutingContext context)
         {
             _logger.LogTrace(
-                message: "[OnActionExecuting] \tRun endpoint: \t/{controller}/{action}/", 
+                message: "[OnActionExecuting] \tRun endpoint: \t/{controller}/{action}/",
                 context.RouteData.Values["controller"], context.RouteData.Values["action"]);
         }
 

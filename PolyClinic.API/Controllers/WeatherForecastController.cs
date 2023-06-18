@@ -1,5 +1,4 @@
 using Microsoft.AspNetCore.Mvc;
-using PolyClinic.API;
 
 namespace PolyClinic.API.Controllers
 {

@@ -18,7 +18,7 @@ namespace PolyClinic.BL.Mapper
         {
             return new Common.Models.Doctor()
             {
-                DoctorId = doctor.DoctorId,
+                DoctorId = doctor.DoctorId.TrimEnd(),
                 DoctorName = doctor.DoctorName,
                 Specialization = doctor.Specialization,
                 Fees = doctor.Fees

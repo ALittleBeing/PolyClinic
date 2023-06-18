@@ -22,8 +22,8 @@ namespace PolyClinic.BL.Mapper
                 PatientId = appointment.PatientId,
                 DoctorId = appointment.DoctorId,
                 DateofAppointment = appointment.DateofAppointment,
-                //Doctor = BuildDoctorDTO(appointment.Doctor),
-                //Patient = BuildPatientDTO(appointment.Patient)
+                DoctorName = appointment.Doctor.DoctorName,
+                PatientName = appointment.Patient.PatientName
             };
         }
 
@@ -39,9 +39,7 @@ namespace PolyClinic.BL.Mapper
                 AppointmentNo = appointment.AppointmentNo,
                 PatientId = appointment.PatientId,
                 DoctorId = appointment.DoctorId,
-                DateofAppointment = appointment.DateofAppointment,
-                //Doctor = BuildDoctorDTO(appointment.Doctor),
-                //Patient = BuildPatientDTO(appointment.Patient)
+                DateofAppointment = appointment.DateofAppointment
             };
         }
     }

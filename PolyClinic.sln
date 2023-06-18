@@ -3,13 +3,15 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.6.33801.468
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PolyClinic.DAL", "PolyClinicDAL\PolyClinic.DAL.csproj", "{C89B7957-992F-48ED-A104-06830CB874CD}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PolyClinic.DAL", "PolyClinic.DAL\PolyClinic.DAL.csproj", "{C89B7957-992F-48ED-A104-06830CB874CD}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PolyClinic.Common", "PolyClinic.Common\PolyClinic.Common.csproj", "{892564A4-44DC-4659-8E51-66EECAA88413}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PolyClinic.BL", "PolyClinic.BL\PolyClinic.BL.csproj", "{9EA269D1-B160-4FA6-AA89-B37037F86699}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PolyClinic.API", "PolyClinic.API\PolyClinic.API.csproj", "{D3DDBC9B-7A19-41F0-88AC-C3A2D1FBE170}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PolyClinic.Authentication", "PolyClinic.Authentication\PolyClinic.Authentication.csproj", "{D4CAE342-4C12-4B9C-B33C-CA94ACF43A52}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -33,6 +35,10 @@ Global
 		{D3DDBC9B-7A19-41F0-88AC-C3A2D1FBE170}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D3DDBC9B-7A19-41F0-88AC-C3A2D1FBE170}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D3DDBC9B-7A19-41F0-88AC-C3A2D1FBE170}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D4CAE342-4C12-4B9C-B33C-CA94ACF43A52}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D4CAE342-4C12-4B9C-B33C-CA94ACF43A52}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D4CAE342-4C12-4B9C-B33C-CA94ACF43A52}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D4CAE342-4C12-4B9C-B33C-CA94ACF43A52}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

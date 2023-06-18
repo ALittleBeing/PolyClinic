@@ -40,5 +40,6 @@ namespace PolyClinic.Common.Logger
                 streamWriter.WriteLine(logRecord);
             }
         }
+
     }
 }

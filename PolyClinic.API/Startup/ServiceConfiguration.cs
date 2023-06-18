@@ -1,8 +1,12 @@
-﻿using PolyClinic.API.Filters;
+﻿using Microsoft.Extensions.DependencyInjection;
+using PolyClinic.API.Filters;
+using PolyClinic.Authentication.Repository;
 using PolyClinic.BL.Interface;
 using PolyClinic.BL.Services;
-using PolyClinic.DAL;
-using System.Reflection;
+using PolyClinic.DAL.Repository;
+using Microsoft.AspNetCore.Identity;
+using PolyClinic.Authentication;
+using PolyClinic.Authentication.Models;
 
 namespace PolyClinic.API.Startup
 {
@@ -12,50 +16,45 @@ namespace PolyClinic.API.Startup
     public static class ServiceConfiguration
     {
         /// <summary>
-        /// Extension method of IServiceCollection
+        /// Extension method of IServiceCollection for configuring services
         /// </summary>
         /// <param name="services"></param>
         /// <returns>Returns IServiceCollection object</returns>
         public static IServiceCollection RegisterServices(this IServiceCollection services)
         {
-            //configure controllers with custom Action filter for logging
+            // configure controllers with custom Action filter for logging
             services.AddControllers(Options => Options.Filters.Add(typeof(LogActionFilter)));
+            // Adding Swagger with custom configuration
+            services.AddSwaggerService();
+            // Adding Identity for Authentication
+            services.AddDbContext<AuthenticationDbContext>();
+            services.AddIdentityCore<ApplicationUser>(options => options.User.RequireUniqueEmail = true)
+                    .AddEntityFrameworkStores<AuthenticationDbContext>();
+            
+            // Adding custom business logic services
+            services.AddScoped<IAppointmentService>(provider =>
+            new AppointmentService(
+                new AppointmentRepository(provider.GetRequiredService<ILogger<AppointmentRepository>>()),
+                provider.GetRequiredService<ILogger<AppointmentService>>()));
 
-            // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
-            services.AddEndpointsApiExplorer();
-            services.AddSwaggerGen(options =>
-            {
-                options.SwaggerDoc("v1", new Microsoft.OpenApi.Models.OpenApiInfo
-                {
-                    Version = "v1",
-                    Title = "PolyClinic Api",
-                    Description = "An ASP.NET CORE Web API for PolyClinic",
-                    TermsOfService = new Uri("https://learn.microsoft.com/"),
-                    Contact = new Microsoft.OpenApi.Models.OpenApiContact
-                    {
-                        Name = "API Developer",
-                        Email = "api@developer.com",
-                        Url = new Uri("https://learn.microsoft.com/")
-                    },
-                    License = new Microsoft.OpenApi.Models.OpenApiLicense
-                    {
-                        Name = "Development License",
-                        Url = new Uri("https://learn.microsoft.com/")
-                    },
+            services.AddScoped<IPatientService>(provider =>
+            new PatientService(
+                new PatientRepository(provider.GetRequiredService<ILogger<PatientRepository>>()),
+                provider.GetRequiredService<ILogger<PatientService>>()));
 
-                });
-                // using System.Reflection;
-                var xmlFilename = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
-                options.IncludeXmlComments(Path.Combine(AppContext.BaseDirectory, xmlFilename));
-            });
-            //creating new instance of DAL repository to inject into the services
-            IPolyClinicRepository polyClinicRepository = new PolyClinicRepository();
-            //injecting custom services
-            services.AddSingleton<IPatientService>(new PatientService(polyClinicRepository));
-            services.AddSingleton<IAppointmentService>(new AppointmentService(polyClinicRepository));
-           
-            var doctorServiceLogger = services.BuildServiceProvider().GetRequiredService<ILogger<DoctorService>>();
-            services.AddSingleton<IDoctorService>(new DoctorService(polyClinicRepository, doctorServiceLogger));
+            services.AddScoped<IDoctorService>(provider => 
+            new DoctorService(
+                new DoctorRepository(provider.GetRequiredService<ILogger<DoctorRepository>>()),
+                provider.GetRequiredService<ILogger<DoctorService>>()));
+
+            // Adding custom Authentication service
+            services.AddScoped<IAuthenticationService>(provider =>
+            new AuthenticationService(
+                new AuthenticationRepository(provider.GetRequiredService<AuthenticationDbContext>(), provider.GetRequiredService<UserManager<ApplicationUser>>()),
+                new JwtRepository(),
+                provider.GetRequiredService<ILogger<AuthenticationService>>()));
+
+            
             return services;
         }
     }

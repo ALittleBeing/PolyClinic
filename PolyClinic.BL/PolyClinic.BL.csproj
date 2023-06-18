@@ -7,7 +7,8 @@
 
   <ItemGroup>
     <ProjectReference Include="..\PolyClinic.Common\PolyClinic.Common.csproj" />
-    <ProjectReference Include="..\PolyClinicDAL\PolyClinic.DAL.csproj" />
+    <ProjectReference Include="..\PolyClinic.DAL\PolyClinic.DAL.csproj" />
+    <ProjectReference Include="..\PolyClinic.Authentication\PolyClinic.Authentication.csproj" />
   </ItemGroup>
 
 </Project>

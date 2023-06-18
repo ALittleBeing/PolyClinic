@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-
-namespace PolyClinic.DAL.Models;
+﻿namespace PolyClinic.DAL.Models;
 
 public partial class Patient
 {

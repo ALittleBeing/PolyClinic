@@ -4,11 +4,10 @@ namespace PolyClinic.BL.Interface
 {
     public interface IPatientService
     {
-        List<Patient> GetAllPatientDetails();
-        Patient GetPatientDetails(string id);
-        string AddNewPatientDetails(Patient patient);
+        List<Patient> GetAllPatients();
+        Patient GetPatientById(string patientId);
+        string AddNewPatient(Patient patient);
         bool UpdatePatientAge(string patientId, byte age);
         bool RemovePatient(string patientId);
-        
     }
 }

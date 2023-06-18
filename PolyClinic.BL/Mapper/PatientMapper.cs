@@ -20,7 +20,7 @@ namespace PolyClinic.BL.Mapper
         {
             return new Common.Models.Patient
             {
-                PatientId = patient.PatientId,
+                PatientId = patient.PatientId.TrimEnd(),
                 PatientName = patient.PatientName,
                 Age = patient.Age,
                 Gender = patient.Gender,

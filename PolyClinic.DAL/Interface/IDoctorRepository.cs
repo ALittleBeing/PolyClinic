@@ -1,13 +1,13 @@
-﻿using PolyClinic.Common.Models;
+﻿using PolyClinic.DAL.Models;
 
-namespace PolyClinic.BL.Interface
+namespace PolyClinic.DAL.Interface
 {
-    public interface IDoctorService
+    public interface IDoctorRepository: IDisposable
     {
         string AddDoctor(Doctor doctor);
         List<Doctor> GetAllDoctors();
         Doctor GetDoctorById(string doctorId);
-        bool UpdateDoctorFees(string doctorId, decimal fees);
         bool RemoveDoctor(string doctorId);
+        bool UpdateDoctorFees(string doctorId, decimal fees);
     }
 }

@@ -1,5 +1,4 @@
 ﻿using Microsoft.AspNetCore.Diagnostics;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace PolyClinic.API.Controllers
@@ -7,7 +6,7 @@ namespace PolyClinic.API.Controllers
     /// <summary>
     /// Error Controller class for ErrorHandler middleware
     /// </summary>
-    [ApiExplorerSettings(IgnoreApi =true)]
+    [ApiExplorerSettings(IgnoreApi = true)]
     public class ErrorsController : ControllerBase
     {
         private readonly ILogger<ErrorsController> _logger;
@@ -20,13 +19,13 @@ namespace PolyClinic.API.Controllers
         {
             _logger = logger;
         }
-        
+
         /// <summary>
         /// Method to handle Exceptions globally
         /// </summary>
         /// <returns></returns>
         [Route("/error")]
-        public IActionResult HandleError() 
+        public IActionResult HandleError()
         {
             var exception = HttpContext.Features.Get<IExceptionHandlerFeature>().Error;
             _logger.LogError(exception: exception, message: nameof(exception.TargetSite.GetType));

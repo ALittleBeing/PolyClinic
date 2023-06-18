@@ -1,12 +1,13 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using PolyClinic.Common.Models;
-using PolyClinic.API.Filters;
 
 namespace PolyClinic.API.Controllers
 {
     /// <summary>
     /// Appointment Controller class
     /// </summary>
+    [Authorize]
     [Route("api/[controller]/[action]")]
     [ApiController]
     public class AppointmentsController : ControllerBase
@@ -53,22 +54,22 @@ namespace PolyClinic.API.Controllers
         }
 
         /// <summary>
-        /// Fetches a specific appointment
+        /// Fetches a specific appointment with appoinment number
         /// </summary>
-        /// <param name="appointmentNo">Appointment Number</param>
+        /// <param name="appointmentNumber">Appointment Number</param>
         /// <returns>Returns the details of an appointment</returns>
         /// <response code="200">Returns the appointment details if GET action is successful</response>
         /// <response code="400">If appointment number is invalid or if any error occurs </response>
         /// <response code="404">If appointment details are not present</response>
-        [HttpGet("{appointmentNo}")]
+        [HttpGet("{appointmentNumber}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public ActionResult<Doctor> GetDoctorDetails(int appointmentNo)
+        public ActionResult<Doctor> GetAppointment(int appointmentNumber)
         {
-            if (appointmentNo == 0) { return BadRequest("Please provide valid appoinment number"); }
+            if (appointmentNumber == 0) { return BadRequest("Please provide valid appoinment number"); }
 
-            var appointment = _appointmentService.GetAppointmentByNo(appointmentNo);
+            var appointment = _appointmentService.GetAppointmentByNo(appointmentNumber);
             if (appointment != null)
             {
                 return Ok(appointment);

@@ -17,8 +17,7 @@ namespace PolyClinic.Common.Models
         public string DoctorId { get; set; }
         [Required]
         public DateTime DateofAppointment { get; set; }
-
-        public Doctor Doctor { get; set; }
-        public Patient Patient { get; set; }
+        public string DoctorName { get; set; }
+        public string PatientName { get; set; }
     }
 }
