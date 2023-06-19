@@ -1,13 +1,9 @@
 ﻿using Microsoft.Extensions.Logging;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace PolyClinic.Common.Logger
 {
     [ProviderAlias("PolyClinicLogFile")]
-    public class FileLoggerProvider:ILoggerProvider
+    public class FileLoggerProvider : ILoggerProvider
     {
         public readonly FileLoggerOptions Options;
 

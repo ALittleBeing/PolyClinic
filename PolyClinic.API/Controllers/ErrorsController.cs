@@ -21,14 +21,16 @@ namespace PolyClinic.API.Controllers
         }
 
         /// <summary>
-        /// Method to handle Exceptions globally
+        /// Handles Exceptions from Controllers globally
         /// </summary>
         /// <returns></returns>
         [Route("/error")]
         public IActionResult HandleError()
         {
             var exception = HttpContext.Features.Get<IExceptionHandlerFeature>().Error;
-            _logger.LogError(exception: exception, message: nameof(exception.TargetSite.GetType));
+            var message = "[Exception]\t\tMethod:\t" + nameof(exception.TargetSite.GetType)
+                            + "\n[Message]\t" + exception.Message;
+            _logger.LogError(exception: exception, message: message);
 
             return Problem(
                 detail: "Some error occurred. Please try again later.",

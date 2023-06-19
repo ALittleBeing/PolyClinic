@@ -1,12 +1,11 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿using Microsoft.AspNetCore.Identity;
 using PolyClinic.API.Filters;
+using PolyClinic.Authentication;
+using PolyClinic.Authentication.Models;
 using PolyClinic.Authentication.Repository;
 using PolyClinic.BL.Interface;
 using PolyClinic.BL.Services;
 using PolyClinic.DAL.Repository;
-using Microsoft.AspNetCore.Identity;
-using PolyClinic.Authentication;
-using PolyClinic.Authentication.Models;
 
 namespace PolyClinic.API.Startup
 {
@@ -30,31 +29,33 @@ namespace PolyClinic.API.Startup
             services.AddDbContext<AuthenticationDbContext>();
             services.AddIdentityCore<ApplicationUser>(options => options.User.RequireUniqueEmail = true)
                     .AddEntityFrameworkStores<AuthenticationDbContext>();
-            
+
             // Adding custom business logic services
             services.AddScoped<IAppointmentService>(provider =>
-            new AppointmentService(
-                new AppointmentRepository(provider.GetRequiredService<ILogger<AppointmentRepository>>()),
-                provider.GetRequiredService<ILogger<AppointmentService>>()));
+                new AppointmentService(
+                    new AppointmentRepository(provider.GetRequiredService<ILogger<AppointmentRepository>>()),
+                    provider.GetRequiredService<ILogger<AppointmentService>>()));
 
             services.AddScoped<IPatientService>(provider =>
-            new PatientService(
-                new PatientRepository(provider.GetRequiredService<ILogger<PatientRepository>>()),
-                provider.GetRequiredService<ILogger<PatientService>>()));
+                new PatientService(
+                    new PatientRepository(provider.GetRequiredService<ILogger<PatientRepository>>()),
+                    provider.GetRequiredService<ILogger<PatientService>>()));
 
-            services.AddScoped<IDoctorService>(provider => 
-            new DoctorService(
-                new DoctorRepository(provider.GetRequiredService<ILogger<DoctorRepository>>()),
-                provider.GetRequiredService<ILogger<DoctorService>>()));
+            services.AddScoped<IDoctorService>(provider =>
+                new DoctorService(
+                    new DoctorRepository(provider.GetRequiredService<ILogger<DoctorRepository>>()),
+                    provider.GetRequiredService<ILogger<DoctorService>>()));
 
             // Adding custom Authentication service
             services.AddScoped<IAuthenticationService>(provider =>
-            new AuthenticationService(
-                new AuthenticationRepository(provider.GetRequiredService<AuthenticationDbContext>(), provider.GetRequiredService<UserManager<ApplicationUser>>()),
-                new JwtRepository(),
-                provider.GetRequiredService<ILogger<AuthenticationService>>()));
+                new AuthenticationService(
+                    new AuthenticationRepository(provider.GetRequiredService<AuthenticationDbContext>(),
+                        provider.GetRequiredService<UserManager<ApplicationUser>>(),
+                        provider.GetRequiredService<ILogger<AuthenticationRepository>>()),
+                    new JwtRepository(),
+                    provider.GetRequiredService<ILogger<AuthenticationService>>()));
 
-            
+
             return services;
         }
     }

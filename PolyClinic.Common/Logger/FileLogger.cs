@@ -1,12 +1,8 @@
 ﻿using Microsoft.Extensions.Logging;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace PolyClinic.Common.Logger
 {
-    public class FileLogger: ILogger
+    public class FileLogger : ILogger
     {
         protected readonly FileLoggerProvider _fileLoggerProvider;
 

@@ -1,7 +1,7 @@
-using Microsoft.AspNetCore.Mvc;
-using PolyClinic.Common.Models;
-using PolyClinic.BL.Interface;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using PolyClinic.BL.Interface;
+using PolyClinic.Common.Models;
 
 namespace PolyClinic.API.Controllers
 {
@@ -14,13 +14,16 @@ namespace PolyClinic.API.Controllers
     public class UserController : ControllerBase
     {
         private readonly IAuthenticationService _authenticationService;
+        private readonly ILogger<UserController> _logger;
         /// <summary>
         /// Creates User controller instance with injected authentication service
         /// </summary>
         /// <param name="service">BL service injected through Dependency Injection</param>
-        public UserController(IAuthenticationService service)
+        /// <param name="logger"></param>
+        public UserController(IAuthenticationService service, ILogger<UserController> logger)
         {
             _authenticationService = service;
+            _logger = logger;
         }
 
         /// <summary>
@@ -38,6 +41,7 @@ namespace PolyClinic.API.Controllers
             var result = await _authenticationService.CreateUserAsync(user);
             if (string.IsNullOrEmpty(result))
             {
+                _logger.LogInformation("Added new User with username [{username}] successfully", user.UserName);
                 return Created("", "User created successfully with UserName: " + user.UserName);
             }
             return BadRequest(result);
@@ -58,11 +62,12 @@ namespace PolyClinic.API.Controllers
 
             if (string.IsNullOrEmpty(userEmail))
             {
+                _logger.LogInformation("Invalid Credentials provided. UserName: {username}", request.UserName);
                 return BadRequest("Invalid Credentials");
             }
 
             var response = _authenticationService.CreateToken(request.UserName, userEmail);
-
+            _logger.LogInformation("Generated JWT Bearer token for username [{username}] successfully", request.UserName);
             return Ok(response);
 
         }

@@ -1,7 +1,7 @@
-using PolyClinic.API.Startup;
-using PolyClinic.Common.Logger;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
+using PolyClinic.API.Startup;
+using PolyClinic.Common.Logger;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -25,8 +25,8 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
                     ValidateIssuerSigningKey = true,
                     ValidAudience = builder.Configuration["Jwt:Audience"],
                     ValidIssuer = builder.Configuration["Jwt:Issuer"],
-                    IssuerSigningKey = new SymmetricSecurityKey(System.Text.Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"]))
-
+                    IssuerSigningKey = new SymmetricSecurityKey(System.Text.Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"])),
+                    ClockSkew = TimeSpan.Zero
                 };
             });
 builder.Services.AddAuthorization();
@@ -34,7 +34,7 @@ builder.Services.AddAuthorization();
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
-app.ConfigureSwagger();
+app.UseSwaggerService();
 
 app.UseHttpsRedirection();
 // Configuring Exception handler

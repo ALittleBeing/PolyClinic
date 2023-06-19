@@ -1,14 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using System.ComponentModel.DataAnnotations;
 
 namespace PolyClinic.Common.Models
 {
     public class Doctor
     {
-        
+
         public string DoctorId { get; set; }
         [Required]
         public string Specialization { get; set; }

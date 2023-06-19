@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-
-namespace PolyClinic.Common.Logger
+﻿namespace PolyClinic.Common.Logger
 {
     public class FileLoggerOptions
     {

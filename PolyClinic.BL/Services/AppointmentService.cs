@@ -1,7 +1,8 @@
-﻿using PolyClinic.Common.Models;
+﻿using Microsoft.Extensions.Logging;
 using PolyClinic.BL.Interface;
-using Microsoft.Extensions.Logging;
+using PolyClinic.Common.Models;
 using PolyClinic.DAL.Interface;
+using LogEvents = PolyClinic.Common.Logger.LogEvents;
 
 namespace PolyClinic.BL.Services
 {
@@ -32,7 +33,7 @@ namespace PolyClinic.BL.Services
         /// <returns>List of Appointment instances if found. Otherwise, null</returns>
         public List<Appointment> GetAllAppointments()
         {
-            _logger.LogTrace(message: "[OnMethodExecuting] \tMethod: \t{name}", this.GetType());
+            _logger.LogTrace(message: LogEvents.TraceMethodEntryMessage(this.GetType().FullName));
 
             List<Appointment> appointments = null;
             try
@@ -47,11 +48,11 @@ namespace PolyClinic.BL.Services
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, message: "Exception Message: {msg}.\n Occurred on Method: {name}", ex.Message, this.GetType());
+                _logger.LogError(ex, message: LogEvents.ErrorMessage(ex.Message, this.GetType().FullName));
             }
             finally
             {
-                _logger.LogTrace(message: "[OnMethodExecuted] \t\tMethod: \t{name}", this.GetType());
+                _logger.LogTrace(message: LogEvents.TraceMethodExitMessage(this.GetType().FullName));
             }
             return appointments;
         }
@@ -63,7 +64,7 @@ namespace PolyClinic.BL.Services
         /// <returns>Specified Appointment instance if found. Otherwise, null</returns>
         public Appointment GetAppointmentByNo(int appointmentNo)
         {
-            _logger.LogTrace(message: "[OnMethodExecuting] \tMethod: \t{name}", this.GetType());
+            _logger.LogTrace(message: LogEvents.TraceMethodEntryMessage(this.GetType().FullName));
 
             Appointment appointment = null;
             try
@@ -78,38 +79,66 @@ namespace PolyClinic.BL.Services
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, message: "Exception Message: {msg}.\n Occurred on Method: {name}", ex.Message, this.GetType());
+                _logger.LogError(ex, message: LogEvents.ErrorMessage(ex.Message, this.GetType().FullName));
 
             }
             finally
             {
-                _logger.LogTrace(message: "[OnMethodExecuted] \t\tMethod: \t{name}", this.GetType());
+                _logger.LogTrace(message: LogEvents.TraceMethodExitMessage(this.GetType().FullName));
             }
             return appointment;
+        }
+
+        /// <summary>
+        /// Adds new Appointment into the database
+        /// </summary>
+        /// <param name="patientId">Patient Id</param>
+        /// <param name="doctorId">Doctor Id</param>
+        /// <param name="dateofAppointment">Date/Time of Appointment</param>
+        /// <returns>New Appointment number if new Appointment gets added successfully. Otherwise, -1</returns>
+        public int BookAppointment(Appointment appointment)
+        {
+            _logger.LogTrace(message: LogEvents.TraceMethodEntryMessage(this.GetType().FullName));
+            int newAppointmentNo = -1;
+            try
+            {
+                var appointmentDAO = _mapper.Map(appointment);
+                newAppointmentNo = _repository.BookAppointment(appointmentDAO);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, message: LogEvents.ErrorMessage(ex.Message, this.GetType().FullName));
+            }
+            finally
+            {
+                _logger.LogTrace(message: LogEvents.TraceMethodExitMessage(this.GetType().FullName));
+            }
+
+            return newAppointmentNo;
         }
 
         /// <summary>
         /// Removes an appointment instance
         /// </summary>
         /// <param name="appointmentNo">Appointment Number</param>
-        /// <returns>true if specified Appointment instance removed successfully. Otherwise, false</returns>
-        public bool CancelAppointment(int appointmentNo)
+        /// <returns>1 if specified Appointment instance is removed successfully. 0 if Appointment is not found. Otherwise, -1</returns>
+        public int CancelAppointment(int appointmentNo)
         {
-            _logger.LogTrace(message: "[OnMethodExecuting] \tMethod: \t{name}", this.GetType());
+            _logger.LogTrace(message: LogEvents.TraceMethodEntryMessage(this.GetType().FullName));
 
-            bool status;
+            int status = 0;
             try
             {
                 status = _repository.CancelAppointment(appointmentNo);
             }
             catch (Exception ex)
             {
-                status = false;
-                _logger.LogError(ex, message: "Exception Message: {msg}.\n Occurred on Method: {name}", ex.Message, this.GetType());
+                status = -1;
+                _logger.LogError(ex, message: LogEvents.ErrorMessage(ex.Message, this.GetType().FullName));
             }
             finally
             {
-                _logger.LogTrace(message: "[OnMethodExecuted] \t\tMethod: \t{name}", this.GetType());
+                _logger.LogTrace(message: LogEvents.TraceMethodExitMessage(this.GetType().FullName));
             }
 
             return status;

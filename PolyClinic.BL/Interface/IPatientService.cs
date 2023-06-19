@@ -7,7 +7,7 @@ namespace PolyClinic.BL.Interface
         List<Patient> GetAllPatients();
         Patient GetPatientById(string patientId);
         string AddNewPatient(Patient patient);
-        bool UpdatePatientAge(string patientId, byte age);
-        bool RemovePatient(string patientId);
+        int UpdatePatientAge(string patientId, byte age);
+        int RemovePatient(string patientId);
     }
 }

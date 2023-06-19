@@ -13,13 +13,16 @@ namespace PolyClinic.API.Controllers
     public class PatientsController : ControllerBase
     {
         private readonly BL.Interface.IPatientService _patientService;
+        private readonly ILogger<PatientsController> _logger;
         /// <summary>
         /// Constructor of Patient controller
         /// </summary>
         /// <param name="service">BL service injected through Dependency Injection</param>
-        public PatientsController(BL.Interface.IPatientService service)
+        /// <param name="logger"></param>
+        public PatientsController(BL.Interface.IPatientService service, ILogger<PatientsController> logger)
         {
             _patientService = service;
+            _logger = logger;
         }
 
         /// <summary>
@@ -40,10 +43,12 @@ namespace PolyClinic.API.Controllers
 
             if (patients != null)
             {
+                _logger.LogInformation("Fetched all patients successfully");
                 return Ok(patients);
             }
             else
             {
+                _logger.LogInformation("No patients found");
                 return NoContent();
             }
         }
@@ -64,15 +69,18 @@ namespace PolyClinic.API.Controllers
         {
             if (string.IsNullOrEmpty(patientId))
             {
+                _logger.LogInformation("Invalid PatientId provided");
                 return BadRequest("Please provide valid Patient Id");
             }
             var patient = _patientService.GetPatientById(patientId);
             if (patient != null)
             {
+                _logger.LogInformation("Fetched Patient with ID [{patientId}] successfully", patientId);
                 return Ok(patient);
             }
             else
             {
+                _logger.LogInformation("Patient with ID [{patientId}] not found", patientId);
                 return NotFound();
             }
         }
@@ -95,6 +103,7 @@ namespace PolyClinic.API.Controllers
 
             if (!string.IsNullOrEmpty(patientId))
             {
+                _logger.LogInformation("Added new Patient with ID [{patientId}] successfully", patientId);
                 return CreatedAtAction(nameof(GetPatientById), new { patientId }, patientId);
             }
             else
@@ -120,19 +129,25 @@ namespace PolyClinic.API.Controllers
         {
             if (string.IsNullOrEmpty(patientId))
             {
+                _logger.LogInformation("Invalid PatientId provided");
                 return BadRequest("Please provide valid Patient Id");
             }
 
-            bool status;
-            status = _patientService.UpdatePatientAge(patientId, age);
+            int status = _patientService.UpdatePatientAge(patientId, age);
 
-            if (status)
+            if (status == 1)
             {
+                _logger.LogInformation("Age updated for Patient ID [{patientId}] successfully", patientId);
                 return Ok("Patient age updated successfully");
+            }
+            else if (status == 0)
+            {
+                _logger.LogInformation("Patient with ID [{patientId}] not found", patientId);
+                return NotFound("Patient details not found. Make sure Patient Id is correct");
             }
             else
             {
-                return NotFound("Patient details not found. Make sure Patient Id is correct");
+                return BadRequest("Some error occurred. Please try again later.");
             }
         }
 
@@ -152,19 +167,25 @@ namespace PolyClinic.API.Controllers
         {
             if (string.IsNullOrEmpty(patientId))
             {
+                _logger.LogInformation("Invalid PatientId provided");
                 return BadRequest("Please provide valid Patient Id");
             }
 
-            bool status;
-            status = _patientService.RemovePatient(patientId);
+            int status = _patientService.RemovePatient(patientId);
 
-            if (status)
+            if (status == 1)
             {
+                _logger.LogInformation("Removed Patient with ID [{patientId}] successfully", patientId);
                 return Ok($"Removed Patient (ID:{patientId}) successfully");
+            }
+            else if (status == 0)
+            {
+                _logger.LogInformation("Patient with ID [{patientId}] not found", patientId);
+                return NotFound("Patient details not found. Make sure Patient Id is correct");
             }
             else
             {
-                return NotFound("Patient details not found. Make sure Patient Id is correct");
+                return BadRequest("Some error occurred. Please try again later.");
             }
         }
 

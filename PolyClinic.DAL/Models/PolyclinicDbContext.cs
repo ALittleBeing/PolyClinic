@@ -23,7 +23,6 @@ public partial class PolyclinicDbContext : DbContext
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
         var builder = new ConfigurationBuilder().SetBasePath(Directory.GetCurrentDirectory()).AddJsonFile("appsettings.json");
-        //Console.WriteLine("Current Directory for .json: {0}", Directory.GetCurrentDirectory());
         var config = builder.Build();
         var connectionString = config.GetConnectionString("PolyClinicDBConnectionString");
         if (!optionsBuilder.IsConfigured)
@@ -33,7 +32,6 @@ public partial class PolyclinicDbContext : DbContext
     }
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        //base.OnModelCreating(modelBuilder);
         modelBuilder.Entity<Appointment>(entity =>
         {
             entity.HasKey(e => e.AppointmentNo).HasName("pk_AppointmentNo");

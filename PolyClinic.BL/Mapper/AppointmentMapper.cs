@@ -1,9 +1,4 @@
 ﻿using PolyClinic.BL.Interface;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace PolyClinic.BL.Mapper
 {
@@ -21,7 +16,7 @@ namespace PolyClinic.BL.Mapper
                 AppointmentNo = appointment.AppointmentNo,
                 PatientId = appointment.PatientId,
                 DoctorId = appointment.DoctorId,
-                DateofAppointment = appointment.DateofAppointment,
+                DateofAppointment = DateOnly.FromDateTime(appointment.DateofAppointment),
                 DoctorName = appointment.Doctor.DoctorName,
                 PatientName = appointment.Patient.PatientName
             };
@@ -39,7 +34,7 @@ namespace PolyClinic.BL.Mapper
                 AppointmentNo = appointment.AppointmentNo,
                 PatientId = appointment.PatientId,
                 DoctorId = appointment.DoctorId,
-                DateofAppointment = appointment.DateofAppointment
+                DateofAppointment = appointment.DateofAppointment.ToDateTime(TimeOnly.MinValue)
             };
         }
     }

@@ -2,11 +2,7 @@
 using Microsoft.Extensions.Logging;
 using PolyClinic.DAL.Interface;
 using PolyClinic.DAL.Models;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using LogEvents = PolyClinic.Common.Logger.LogEvents;
 
 namespace PolyClinic.DAL.Repository
 {
@@ -36,7 +32,7 @@ namespace PolyClinic.DAL.Repository
         /// <returns>List of Doctor instances if found. Otherwise, null</returns>
         public List<Doctor> GetAllDoctors()
         {
-            _logger.LogTrace(message: "[OnMethodExecuting] \tMethod: \t{name}", this.GetType());
+            _logger.LogTrace(message: LogEvents.TraceMethodEntryMessage(this.GetType().FullName));
 
             List<Doctor> doctors;
             try
@@ -46,16 +42,16 @@ namespace PolyClinic.DAL.Repository
             catch (Exception ex)
             {
                 doctors = null;
-                _logger.LogError(ex, message: "Exception Message: {msg}.\n Occurred on Method: {name}", ex.Message, this.GetType());
+                _logger.LogError(ex.InnerException ?? ex, message: LogEvents.ErrorMessage(ex.InnerException?.Message ?? ex.Message, this.GetType().FullName));
             }
             finally
             {
-                _logger.LogTrace(message: "[OnMethodExecuted] \tMethod: \t{name}", this.GetType());
+                _logger.LogTrace(message: LogEvents.TraceMethodExitMessage(this.GetType().FullName));
             }
 
             return doctors;
         }
-        
+
         /// <summary>
         /// Fetches details of a particular Doctor using Doctor Id from database
         /// </summary>
@@ -63,7 +59,7 @@ namespace PolyClinic.DAL.Repository
         /// <returns>Specified Doctor object instance if found. Otherwise, null</returns>
         public Doctor GetDoctorById(string doctorId)
         {
-            _logger.LogTrace(message: "[OnMethodExecuting] \tMethod: \t{name}", this.GetType());
+            _logger.LogTrace(message: LogEvents.TraceMethodEntryMessage(this.GetType().FullName));
 
             Doctor doctor;
             try
@@ -73,11 +69,11 @@ namespace PolyClinic.DAL.Repository
             catch (Exception ex)
             {
                 doctor = null;
-                _logger.LogError(ex, message: "Exception Message: {msg}.\n Occurred on Method: {name}", ex.Message, this.GetType());
+                _logger.LogError(ex.InnerException ?? ex, message: LogEvents.ErrorMessage(ex.InnerException?.Message ?? ex.Message, this.GetType().FullName));
             }
             finally
             {
-                _logger.LogTrace(message: "[OnMethodExecuted] \tMethod: \t{name}", this.GetType());
+                _logger.LogTrace(message: LogEvents.TraceMethodExitMessage(this.GetType().FullName));
             }
 
             return doctor;
@@ -90,7 +86,7 @@ namespace PolyClinic.DAL.Repository
         /// <returns>Doctor ID of the new instance added. Otherwise, null</returns>
         public string AddDoctor(Doctor doctor)
         {
-            _logger.LogTrace(message: "[OnMethodExecuting] \tMethod: \t{name}", this.GetType());
+            _logger.LogTrace(message: LogEvents.TraceMethodEntryMessage(this.GetType().FullName));
 
             string newDoctorId;
             try
@@ -106,11 +102,11 @@ namespace PolyClinic.DAL.Repository
             catch (Exception ex)
             {
                 newDoctorId = null;
-                _logger.LogError(ex, message: "Exception Message: {msg}.\n Occurred on Method: {name}", ex.Message, this.GetType());
+                _logger.LogError(ex.InnerException ?? ex, message: LogEvents.ErrorMessage(ex.InnerException?.Message ?? ex.Message, this.GetType().FullName));
             }
             finally
             {
-                _logger.LogTrace(message: "[OnMethodExecuted] \tMethod: \t{name}", this.GetType());
+                _logger.LogTrace(message: LogEvents.TraceMethodExitMessage(this.GetType().FullName));
             }
 
             return newDoctorId;
@@ -126,7 +122,7 @@ namespace PolyClinic.DAL.Repository
         /// <returns>A new Doctor Id. Otherwise, null</returns>
         private string GenerateNewDoctorId()
         {
-            _logger.LogTrace(message: "[OnMethodExecuting] \tMethod: \t{name}", this.GetType());
+            _logger.LogTrace(message: LogEvents.TraceMethodEntryMessage(this.GetType().FullName));
 
             string newDoctorId;
             try
@@ -136,7 +132,7 @@ namespace PolyClinic.DAL.Repository
                 {
                     var doctorIds = doctors.ConvertAll(p => Convert.ToUInt16(p.DoctorId[1..].TrimEnd()));
                     doctorIds.Sort();
-                    var lastId = doctorIds.Last();                    
+                    var lastId = doctorIds.Last();
                     newDoctorId = "D" + (lastId + 1);
                 }
                 else
@@ -147,11 +143,11 @@ namespace PolyClinic.DAL.Repository
             catch (Exception ex)
             {
                 newDoctorId = null;
-                _logger.LogError(ex, message: "Exception Message: {msg}.\n Occurred on Method: {name}", ex.Message, this.GetType());
+                _logger.LogError(ex.InnerException ?? ex, message: LogEvents.ErrorMessage(ex.InnerException?.Message ?? ex.Message, this.GetType().FullName));
             }
             finally
             {
-                _logger.LogTrace(message: "[OnMethodExecuted] \tMethod: \t{name}", this.GetType());
+                _logger.LogTrace(message: LogEvents.TraceMethodExitMessage(this.GetType().FullName));
             }
 
             return newDoctorId;
@@ -162,12 +158,12 @@ namespace PolyClinic.DAL.Repository
         /// </summary>
         /// <param name="doctorId">Doctor Id</param>
         /// <param name="fees">Doctor Age</param>
-        /// <returns>true on successful action. Otherwise, false</returns>
-        public bool UpdateDoctorFees(string doctorId, decimal fees)
+        /// <returns>1 if Fees updated successfully. 0 if Doctor is not found. Otherwise, -1</returns>
+        public int UpdateDoctorFees(string doctorId, decimal fees)
         {
-            _logger.LogTrace(message: "[OnMethodExecuting] \tMethod: \t{name}", this.GetType());
+            _logger.LogTrace(message: LogEvents.TraceMethodEntryMessage(this.GetType().FullName));
 
-            bool status = false;
+            int status = 0;
             try
             {
                 Doctor doctor = _context.Doctors.Find(doctorId);
@@ -175,16 +171,17 @@ namespace PolyClinic.DAL.Repository
                 {
                     doctor.Fees = fees;
                     _context.SaveChanges();
-                    status = true;
+                    status = 1;
                 }
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, message: "Exception Message: {msg}.\n Occurred on Method: {name}", ex.Message, this.GetType());
+                status = -1;
+                _logger.LogError(ex.InnerException ?? ex, message: LogEvents.ErrorMessage(ex.InnerException?.Message ?? ex.Message, this.GetType().FullName));
             }
             finally
             {
-                _logger.LogTrace(message: "[OnMethodExecuted] \tMethod: \t{name}", this.GetType());
+                _logger.LogTrace(message: LogEvents.TraceMethodExitMessage(this.GetType().FullName));
             }
 
             return status;
@@ -194,12 +191,12 @@ namespace PolyClinic.DAL.Repository
         /// Removes a doctor instance using Doctor Id from database
         /// </summary>
         /// <param name="doctorId">Doctor Id</param>
-        /// <returns>true if specified doctor instance is deleted. Otherwise, false</returns>
-        public bool RemoveDoctor(string doctorId)
+        /// <returns>1 if specified Doctor instance is deleted. 0 if Doctor is not found. Otherwise, -1</returns>
+        public int RemoveDoctor(string doctorId)
         {
-            _logger.LogTrace(message: "[OnMethodExecuting] \tMethod: \t{name}", this.GetType());
+            _logger.LogTrace(message: LogEvents.TraceMethodEntryMessage(this.GetType().FullName));
 
-            bool status = false;
+            int status = 0;
             try
             {
                 Doctor doctor = _context.Doctors.Find(doctorId);
@@ -207,23 +204,24 @@ namespace PolyClinic.DAL.Repository
                 {
                     _context.Doctors.Remove(doctor);
                     _context.SaveChanges();
-                    status = true;
+                    status = 1;
                 }
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, message: "Exception Message: {msg}.\n Occurred on Method: {name}", ex.Message, this.GetType());
+                status = -1;
+                _logger.LogError(ex.InnerException ?? ex, message: LogEvents.ErrorMessage(ex.InnerException?.Message ?? ex.Message, this.GetType().FullName));
             }
             finally
             {
-                _logger.LogTrace(message: "[OnMethodExecuted] \tMethod: \t{name}", this.GetType());
+                _logger.LogTrace(message: LogEvents.TraceMethodExitMessage(this.GetType().FullName));
             }
 
             return status;
         }
 
         #endregion
-        
+
         #region Dispose
         private bool disposed = false;
 

@@ -2,11 +2,7 @@
 using Microsoft.Extensions.Logging;
 using PolyClinic.DAL.Interface;
 using PolyClinic.DAL.Models;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using LogEvents = PolyClinic.Common.Logger.LogEvents;
 
 namespace PolyClinic.DAL.Repository
 {
@@ -17,7 +13,7 @@ namespace PolyClinic.DAL.Repository
     {
         private readonly PolyclinicDbContext _context;
         private readonly ILogger<AppointmentRepository> _logger;
-        
+
         /// <summary>
         /// Creates Appointment Repository instance with specified logger instance and new DbContext instance
         /// </summary>
@@ -31,12 +27,12 @@ namespace PolyClinic.DAL.Repository
         #region Appointment
 
         /// <summary>
-        /// Method to fetch all the appointments from Database
+        /// Fetches all the appointments from Database
         /// </summary>
         /// <returns>List of Appointment instances if found. Otherwise, null</returns>
         public List<Appointment> GetAllAppointments()
         {
-            _logger.LogTrace(message: "[OnMethodExecuting] \tMethod: \t{name}", this.GetType());
+            _logger.LogTrace(message: LogEvents.TraceMethodEntryMessage(this.GetType().FullName));
 
             List<Appointment> appointments;
             try
@@ -50,11 +46,11 @@ namespace PolyClinic.DAL.Repository
             catch (Exception ex)
             {
                 appointments = null;
-                _logger.LogError(ex, message: "Exception Message: {msg}.\n Occurred on Method: {name}", ex.Message, this.GetType());
+                _logger.LogError(ex.InnerException ?? ex, message: LogEvents.ErrorMessage(ex.InnerException?.Message ?? ex.Message, this.GetType().FullName));
             }
             finally
             {
-                _logger.LogTrace(message: "[OnMethodExecuted] \tMethod: \t{name}", this.GetType());
+                _logger.LogTrace(message: LogEvents.TraceMethodExitMessage(this.GetType().FullName));
             }
 
             return appointments;
@@ -62,13 +58,13 @@ namespace PolyClinic.DAL.Repository
         }
 
         /// <summary>
-        /// Method to fetch details of a particular appointment instance from Database
+        /// Fetches details of a particular appointment instance from Database
         /// </summary>
         /// <param name="appointmentNo">Appointment number</param>
         /// <returns>Specified Appointment instance if found. Otherwise, null</returns>
         public Appointment GetAppointment(int appointmentNo)
         {
-            _logger.LogTrace(message: "[OnMethodExecuting] \tMethod: \t{name}", this.GetType());
+            _logger.LogTrace(message: LogEvents.TraceMethodEntryMessage(this.GetType().FullName));
 
             Appointment appointment;
             try
@@ -82,37 +78,76 @@ namespace PolyClinic.DAL.Repository
             catch (Exception ex)
             {
                 appointment = null;
-                _logger.LogError(ex, message: "Exception Message: {msg}.\n Occurred on Method: {name}", ex.Message, this.GetType());
+                _logger.LogError(ex.InnerException ?? ex, message: LogEvents.ErrorMessage(ex.InnerException?.Message ?? ex.Message, this.GetType().FullName));
             }
             finally
             {
-                _logger.LogTrace(message: "[OnMethodExecuted] \tMethod: \t{name}", this.GetType());
+                _logger.LogTrace(message: LogEvents.TraceMethodExitMessage(this.GetType().FullName));
             }
 
             return appointment;
         }
 
-        public string BookAppointment()
+        /// <summary>
+        /// Adds new Appointment into the database
+        /// </summary>
+        /// <param name="appointment">Appointment instance</param>
+        /// <returns>New Appointment number if new Appointment gets added successfully. -2 if Appointment already exists for either Doctor or Patient. - 3 if PatientID/DoctorID is/are invalid. Otherwise, -1</returns>
+        public int BookAppointment(Appointment newAppointment)
         {
-            _logger.LogTrace(message: "[OnMethodExecuting] \tMethod: \t{name}", this.GetType());
+            _logger.LogTrace(message: LogEvents.TraceMethodEntryMessage(this.GetType().FullName));
+            int newAppointmentNo;
+            try
+            {
+                // Check if there is appointment for given PatientId or DoctorId with same datetime 
+                var isOccupied = _context.Appointments.Any(a =>
+                    a.DateofAppointment.Equals(newAppointment.DateofAppointment)
+                    && (a.DoctorId.Equals(newAppointment.DoctorId)
+                    || a.PatientId.Equals(newAppointment.PatientId)));
 
-            throw new NotImplementedException();
-            //finally
-            //{
-            //    _logger.LogTrace(message: "[OnMethodExecuted] \tMethod: \t{name}", this.GetType());
-            //}
+                // If no appointment found for given PatientId or DoctorId with same datetime 
+                if (!isOccupied)
+                {
+                    _context.Appointments.Add(newAppointment);
+                    _context.SaveChanges();
+                    newAppointmentNo = newAppointment.AppointmentNo;
+                }
+                else
+                {
+                    newAppointmentNo = -2;
+                }
+
+            }
+            catch (DbUpdateException ex) when (ex.InnerException?.Message.Contains("conflicted with the FOREIGN KEY constraint") ?? false)
+            {
+                //Handling Foreign key conflict issue
+                newAppointmentNo = -3;
+                //Microsoft.Data.SqlClient.SqlException (0x80131904): The INSERT statement conflicted with the FOREIGN KEY constraint "fk_PatientID". The conflict occurred in database "PolyclinicDB", table "dbo.Patients", column 'PatientID'.
+                _logger.LogError(ex.InnerException, message: LogEvents.ErrorMessage(ex.InnerException.Message, this.GetType().FullName));
+            }
+            catch (Exception ex) // Logging other exceptions
+            {
+                newAppointmentNo = -1;
+                _logger.LogError(ex.InnerException ?? ex, message: LogEvents.ErrorMessage(ex.InnerException?.Message ?? ex.Message, this.GetType().FullName));
+            }
+            finally
+            {
+                _logger.LogTrace(message: LogEvents.TraceMethodExitMessage(this.GetType().FullName));
+            }
+
+            return newAppointmentNo;
         }
 
         /// <summary>
-        /// Method to delete an appointment instance from Database
+        /// Deletes an appointment instance from Database
         /// </summary>
         /// <param name="appointmentNo">Appointment Number</param>
-        /// <returns>true if specified Appointment instance is removed successfully. Otherwise, false</returns>
-        public bool CancelAppointment(int appointmentNo)
+        /// <returns>1 if specified Appointment instance is removed successfully. 0 if Appointment is not found. Otherwise, -1</returns>
+        public int CancelAppointment(int appointmentNo)
         {
-            _logger.LogTrace(message: "[OnMethodExecuting] \tMethod: \t{name}", this.GetType());
+            _logger.LogTrace(message: LogEvents.TraceMethodEntryMessage(this.GetType().FullName));
 
-            bool status = false;
+            int status = 0;
             try
             {
                 Appointment appointmentsObj = _context.Appointments.Find(appointmentNo);
@@ -120,16 +155,17 @@ namespace PolyClinic.DAL.Repository
                 {
                     _context.Appointments.Remove(appointmentsObj);
                     _context.SaveChanges();
-                    status = true;
+                    status = 1;
                 }
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, message: "Exception Message: {msg}.\n Occurred on Method: {name}", ex.Message, this.GetType());
+                status = -1;
+                _logger.LogError(ex.InnerException ?? ex, message: LogEvents.ErrorMessage(ex.InnerException?.Message ?? ex.Message, this.GetType().FullName));
             }
             finally
             {
-                _logger.LogTrace(message: "[OnMethodExecuted] \tMethod: \t{name}", this.GetType());
+                _logger.LogTrace(message: LogEvents.TraceMethodExitMessage(this.GetType().FullName));
             }
 
             return status;

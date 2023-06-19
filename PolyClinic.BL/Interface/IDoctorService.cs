@@ -7,7 +7,7 @@ namespace PolyClinic.BL.Interface
         string AddDoctor(Doctor doctor);
         List<Doctor> GetAllDoctors();
         Doctor GetDoctorById(string doctorId);
-        bool UpdateDoctorFees(string doctorId, decimal fees);
-        bool RemoveDoctor(string doctorId);
+        int UpdateDoctorFees(string doctorId, decimal fees);
+        int RemoveDoctor(string doctorId);
     }
 }

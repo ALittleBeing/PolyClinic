@@ -1,5 +1,5 @@
-﻿using System.Reflection;
-using Microsoft.OpenApi.Models;
+﻿using Microsoft.OpenApi.Models;
+using System.Reflection;
 
 namespace PolyClinic.API.Startup
 {
@@ -72,11 +72,11 @@ namespace PolyClinic.API.Startup
             return services;
         }
         /// <summary>
-        /// Extension method of WebApplication to configure swagger
+        /// Extension method of WebApplication to use swagger with custom configurations
         /// </summary>
         /// <param name="app"></param>
         /// <returns></returns>
-        public static WebApplication ConfigureSwagger(this WebApplication app)
+        public static WebApplication UseSwaggerService(this WebApplication app)
         {
             /*if (app.Environment.IsDevelopment())
             {

@@ -6,6 +6,8 @@ namespace PolyClinic.BL.Interface
     {
         List<Appointment> GetAllAppointments();
         Appointment GetAppointmentByNo(int appointmentNo);
-        bool CancelAppointment(int appointmentNo);
+
+        int BookAppointment(Appointment appointment);
+        int CancelAppointment(int appointmentNo);
     }
 }

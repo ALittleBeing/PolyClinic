@@ -25,7 +25,7 @@ namespace PolyClinic.API.Filters
         public void OnActionExecuting(ActionExecutingContext context)
         {
             _logger.LogTrace(
-                message: "[OnActionExecuting] \tRun endpoint: \t/{controller}/{action}/",
+                message: "[OnActionExecuting]\tRun endpoint:\t/{controller}/{action}/",
                 context.RouteData.Values["controller"], context.RouteData.Values["action"]);
         }
 
@@ -36,7 +36,7 @@ namespace PolyClinic.API.Filters
         public void OnActionExecuted(ActionExecutedContext context)
         {
             _logger.LogTrace(
-                message: "[OnActionExecuted] \tExiting from endpoint: \t/{controller}/{action}/",
+                message: "[OnActionExecuted]\tExit endpoint:\t/{controller}/{action}/",
                 context.RouteData.Values["controller"], context.RouteData.Values["action"]);
         }
     }

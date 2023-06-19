@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using System.ComponentModel.DataAnnotations;
 
 namespace PolyClinic.Common.Models
 {
@@ -16,7 +12,7 @@ namespace PolyClinic.Common.Models
         [Range(1, 130)]
         public byte Age { get; set; }
         [Required]
-        [RegularExpression("^[MF]$", ErrorMessage ="Gender can only be either M or F")]
+        [RegularExpression("^[MF]$", ErrorMessage = "Gender can only be either M or F")]
         public string Gender { get; set; }
         [Required]
         [Phone]

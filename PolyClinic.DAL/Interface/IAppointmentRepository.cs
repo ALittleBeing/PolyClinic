@@ -2,10 +2,10 @@
 
 namespace PolyClinic.DAL.Interface
 {
-    public interface IAppointmentRepository:IDisposable
+    public interface IAppointmentRepository : IDisposable
     {
-        string BookAppointment();
-        bool CancelAppointment(int appointmentNo);
+        int BookAppointment(Appointment appointment);
+        int CancelAppointment(int appointmentNo);
         List<Appointment> GetAllAppointments();
         Appointment GetAppointment(int appointmentNo);
     }

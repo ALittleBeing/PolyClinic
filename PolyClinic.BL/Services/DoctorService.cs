@@ -1,12 +1,8 @@
-﻿using PolyClinic.BL.Interface;
+﻿using Microsoft.Extensions.Logging;
+using PolyClinic.BL.Interface;
 using PolyClinic.Common.Models;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Microsoft.Extensions.Logging;
 using PolyClinic.DAL.Interface;
+using LogEvents = PolyClinic.Common.Logger.LogEvents;
 
 namespace PolyClinic.BL.Services
 {
@@ -39,7 +35,7 @@ namespace PolyClinic.BL.Services
         /// <returns>List of Doctor instances if found. Otherwise, null</returns>
         public List<Doctor> GetAllDoctors()
         {
-            _logger.LogTrace(message: "[OnMethodExecuting] \tMethod: \t{name}", this.GetType());
+            _logger.LogTrace(message: LogEvents.TraceMethodEntryMessage(this.GetType().FullName));
             List<Doctor> doctors = null;
             try
             {
@@ -53,11 +49,11 @@ namespace PolyClinic.BL.Services
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, message: "Exception Message: {msg}.\n Occurred on Method: {name}", ex.Message, this.GetType());
+                _logger.LogError(ex, message: LogEvents.ErrorMessage(ex.Message, this.GetType().FullName));
             }
             finally
             {
-                _logger.LogTrace(message: "[OnMethodExecuted] \t\tMethod: \t{name}", this.GetType());
+                _logger.LogTrace(message: LogEvents.TraceMethodExitMessage(this.GetType().FullName));
             }
             return doctors;
         }
@@ -69,7 +65,7 @@ namespace PolyClinic.BL.Services
         /// <returns>Specified Doctor object instance if found. Otherwise, null</returns>
         public Doctor GetDoctorById(string doctorId)
         {
-            _logger.LogTrace(message: "[OnMethodExecuting] \tMethod: \t{name}", this.GetType());
+            _logger.LogTrace(message: LogEvents.TraceMethodEntryMessage(this.GetType().FullName));
             Doctor doctor = null;
             try
             {
@@ -83,11 +79,11 @@ namespace PolyClinic.BL.Services
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, message: "Exception Message: {msg}.\n Occurred on Method: \t{name}", ex.Message, this.GetType());
+                _logger.LogError(ex, message: LogEvents.ErrorMessage(ex.Message, this.GetType().FullName));
             }
             finally
             {
-                _logger.LogTrace(message: "[OnMethodExecuted] \t\tMethod: \t{name}", this.GetType());
+                _logger.LogTrace(message: LogEvents.TraceMethodExitMessage(this.GetType().FullName));
             }
             return doctor;
         }
@@ -99,7 +95,7 @@ namespace PolyClinic.BL.Services
         /// <returns>Doctor ID of the new instance added. Otherwise, null</returns>
         public string AddDoctor(Doctor doctor)
         {
-            _logger.LogTrace(message: "[OnMethodExecuting] \tMethod: \t{name}", this.GetType());
+            _logger.LogTrace(message: LogEvents.TraceMethodEntryMessage(this.GetType().FullName));
 
             string doctorId;
             try
@@ -111,12 +107,12 @@ namespace PolyClinic.BL.Services
             catch (Exception ex)
             {
                 doctorId = null;
-                _logger.LogError(ex, message: "Exception Message: {msg}.\n Occurred on Method: \t{name}", ex.Message, this.GetType());
+                _logger.LogError(ex, message: LogEvents.ErrorMessage(ex.Message, this.GetType().FullName));
 
             }
             finally
             {
-                _logger.LogTrace(message: "[OnMethodExecuted] \tMethod: \t{name}", this.GetType());
+                _logger.LogTrace(message: LogEvents.TraceMethodExitMessage(this.GetType().FullName));
             }
             return doctorId;
         }
@@ -126,23 +122,23 @@ namespace PolyClinic.BL.Services
         /// </summary>
         /// <param name="doctorId">Doctor Id</param>
         /// <param name="fees">Doctor Age</param>
-        /// <returns>true on successful action. Otherwise, false</returns>
-        public bool UpdateDoctorFees(string doctorId, decimal fees)
+        /// <returns>1 if Fees updated successfully. 0 if Doctor is not found. Otherwise, -1</returns>
+        public int UpdateDoctorFees(string doctorId, decimal fees)
         {
-            _logger.LogTrace(message: "[OnMethodExecuting] \tMethod: \t{name}", this.GetType());
-            bool status = false;
+            _logger.LogTrace(message: LogEvents.TraceMethodEntryMessage(this.GetType().FullName));
+            int status = 0;
             try
             {
                 status = _repository.UpdateDoctorFees(doctorId, fees);
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, message: "Exception Message: {msg}.\n Occurred on Method: \t{name}", ex.Message, this.GetType());
-                throw;
+                status = -1;
+                _logger.LogError(ex, message: LogEvents.ErrorMessage(ex.Message, this.GetType().FullName));
             }
             finally
             {
-                _logger.LogTrace(message: "[OnMethodExecuted] \t\tMethod: \t{name}", this.GetType());
+                _logger.LogTrace(message: LogEvents.TraceMethodExitMessage(this.GetType().FullName));
             }
             return status;
         }
@@ -151,24 +147,24 @@ namespace PolyClinic.BL.Services
         /// Removes a doctor instance using Doctor Id
         /// </summary>
         /// <param name="doctorId">Doctor Id</param>
-        /// <returns>true if specified doctor instance is deleted. Otherwise, false</returns>
-        public bool RemoveDoctor(string doctorId)
+        /// <returns>1 if specified Doctor instance is deleted. 0 if Doctor is not found. Otherwise, -1</returns>
+        public int RemoveDoctor(string doctorId)
         {
-            _logger.LogTrace(message: "[OnMethodExecuting] \tMethod: \t{name}", this.GetType());
+            _logger.LogTrace(message: LogEvents.TraceMethodEntryMessage(this.GetType().FullName));
 
-            bool status = false;
+            int status = 0;
             try
             {
                 status = _repository.RemoveDoctor(doctorId);
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, message: "Exception Message: {msg}.\n Occurred on Method: \t{name}", ex.Message, this.GetType());
-                throw;
+                status = -1;
+                _logger.LogError(ex, message: LogEvents.ErrorMessage(ex.Message, this.GetType().FullName));
             }
             finally
             {
-                _logger.LogTrace(message: "[OnMethodExecuted] \t\tMethod: \t{name}", this.GetType());
+                _logger.LogTrace(message: LogEvents.TraceMethodExitMessage(this.GetType().FullName));
             }
             return status;
         }
